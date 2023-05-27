@@ -1,15 +1,16 @@
 const express = require('express');
 const database = require('../database');
 const router = express.Router()
-
+const bcrypt = require('bcryptjs');
 
 router.post('/createuser', async (req, res) => {
     console.log(req.body);
+    var salt = bcrypt.genSaltSync(10);
     const user = {
         fullname: req.body.fullname,
         number: req.body.number,
         email: req.body.email,
-        password: req.body.password
+        password: bcrypt.hashSync(req.body.password, salt)
 
     }
 
@@ -19,10 +20,12 @@ router.post('/createuser', async (req, res) => {
         where: { email: user.email }
     })
 
-    
+
 
     if (founduser) {
         return res.status(400).send({
+            status: '400',
+            field: 'email',
             message: 'user already exists'
         })
     }
