@@ -2,7 +2,10 @@ const express = require('express');
 const database = require('../database');
 const router = express.Router()
 const bcrypt = require('bcryptjs');
-
+const checkUser = require('../User/Service');
+require('dotenv').config();
+var jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET
 router.post('/createuser', async (req, res) => {
     console.log(req.body);
     var salt = bcrypt.genSaltSync(10);
@@ -55,11 +58,26 @@ router.post('/createuser', async (req, res) => {
         })
     }
 
+})
 
 
+router.post('/login', async (req, res) => {
+    const user = req.body
 
-
-
+    checkUser(user)
+        .then((user) => {
+            const authtoken = jwt.sign({
+                ...user
+            }, JWT_SECRET)
+            res.status(200).send({
+                authtoken: authtoken
+            })
+        })
+        .catch(err => {
+            res.status(err.status).send({
+                message: err.message
+            })
+        })
 
 
 })
