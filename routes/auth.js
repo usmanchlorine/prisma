@@ -70,10 +70,16 @@ router.post('/login', async (req, res) => {
                 ...user
             }, JWT_SECRET)
             res.status(200).send({
+                user: {
+                    username: user.data.fullname,
+                    email: user.data.email,
+                    number: user.data.number
+                },
                 authtoken: authtoken
             })
         })
         .catch(err => {
+            console.log(err)
             res.status(err.status).send({
                 message: err.message
             })
